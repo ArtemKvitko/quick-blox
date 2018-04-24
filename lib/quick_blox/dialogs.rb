@@ -76,5 +76,31 @@ module QuickBlox
     def each(&block)
       items.each(&block)
     end
+
+    def self.unread_list(session, dialog_ids = [])
+
+      dialog_ids = dialog_ids.present? && dialog_ids.is_a?(Array) ? "chat_dialog_ids=#{dialog_ids.join(',')}" : ""
+
+      url = "#{ QuickBlox.configuration.host }/chat/Message/unread.json?#{ dialog_ids }&"
+
+      RestClient::Request.execute(
+          method: :get,
+          url: url,
+          headers: {
+              'QuickBlox-REST-API-Version': QuickBlox.configuration.api_version,
+              'QB-Token': session.token
+          }
+      ){ |response, request, result|
+        parsed_response = JSON.parse(response.body)
+
+        case result.code.to_i
+          when 200
+            parsed_response
+          else
+            response = JSON.parse(response)
+            raise QuickBlox::Exceptions::Response, response['errors']
+        end
+      }
+    end
   end
 end

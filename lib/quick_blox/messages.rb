@@ -42,8 +42,8 @@ module QuickBlox
 
     def self.list(session, options = {})
       instance = new
-
-      url = "#{ QuickBlox.configuration.host }/chat/Message.json?chat_dialog_id=#{ options[:chat_dialog_id] }&"
+      request_params = options.map { |key, val| "#{key}=#{val}"}.join('&')
+      url = "#{ QuickBlox.configuration.host }/chat/Message.json?#{ request_params }"
 
       RestClient::Request.execute(
           method: :get,
